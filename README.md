@@ -1,0 +1,1 @@
+This is a webview version of Youtube for Android. It slightly modifies the web version for more onscreen space. Also an iframe can be loaded instead of the main page using the embedded version of Youtube.
