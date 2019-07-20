@@ -2,11 +2,15 @@ package com.example.blyoutube;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Webview = findViewById(R.id.Youtube);
+        Webview.setWebChromeClient(new MyChrome());
         Webview.setWebViewClient(new WebClient());//Prevents clicked links from opening in the browser
         Webview.loadUrl("https://www.youtube.com");//Website to load
 
@@ -45,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             view.evaluateJavascript("document.getElementById('page-manager').style.margin='0';",null);
 
 
-            //I doubt this works as Youtube doesn't load each page regularly therefore if this element isn't present
+            //This works as Youtube doesn't load each page regularly therefore if this element isn't present
             //on the home page (it isn't) then it doesn't affect the page
             view.evaluateJavascript("document.getElementById('primary').style.padding='0px';",null);
         }
@@ -60,4 +65,50 @@ public class MainActivity extends AppCompatActivity {
             super.onBackPressed();//Or exit app
         }
     }
+
+
+
+//Required to make it work with fullscreen https://www.monstertechnocodes.com/2018/07/how-to-enable-fullscreen-mode-in-any.html
+private class MyChrome extends WebChromeClient {
+
+    private View mCustomView;
+    private WebChromeClient.CustomViewCallback mCustomViewCallback;
+    private int mOriginalOrientation;
+    private int mOriginalSystemUiVisibility;
+
+    MyChrome() {}
+
+    public Bitmap getDefaultVideoPoster()
+    {
+        if (mCustomView == null) {
+            return null;
+        }
+        return BitmapFactory.decodeResource(getApplicationContext().getResources(), 2130837573);
+    }
+
+    public void onHideCustomView()
+    {
+        ((FrameLayout)getWindow().getDecorView()).removeView(this.mCustomView);
+        this.mCustomView = null;
+        getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
+        setRequestedOrientation(this.mOriginalOrientation);
+        this.mCustomViewCallback.onCustomViewHidden();
+        this.mCustomViewCallback = null;
+    }
+
+    public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback)
+    {
+        if (this.mCustomView != null)
+        {
+            onHideCustomView();
+            return;
+        }
+        this.mCustomView = paramView;
+        this.mOriginalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+        this.mOriginalOrientation = getRequestedOrientation();
+        this.mCustomViewCallback = paramCustomViewCallback;
+        ((FrameLayout)getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+        getWindow().getDecorView().setSystemUiVisibility(3846);
+    }
+}
 }
