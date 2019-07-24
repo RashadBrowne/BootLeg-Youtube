@@ -46,14 +46,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPageFinished(WebView view, String url) {//Override the default function and when the website loads execute some javascript
-            view.evaluateJavascript("document.getElementById('masthead-container').style.display='none';",null);
-            view.evaluateJavascript("document.getElementById('page-manager').style.margin='0';",null);
+            view.evaluateJavascript("document.documentElement.style.setProperty('--yt-spec-brand-button-background','#002ccc');",null);
+            //view.evaluateJavascript("document.getElementById('masthead-container').style.display='none';",null);
+            //view.evaluateJavascript("document.getElementById('page-manager').style.margin='0';",null);
 
 
             //This works as Youtube doesn't load each page regularly therefore if this element isn't present
             //on the home page (it isn't) then it doesn't affect the page
             view.evaluateJavascript("document.getElementById('primary').style.padding='0px';",null);
-        }
+            }
     }
 
     @Override//Go back on the website
